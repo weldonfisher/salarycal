@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>මාසික වැටුප් කැල්කියුලේටරය</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full m-4 border border-gray-200">
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">වැටුප් කැල්කියුලේටරය</h1>
+        <p class="text-sm text-gray-500 text-center mb-8">
+            ඔබගේ මූලික වැටුප සහ අතිකාල විස්තර ඇතුලත් කර ඔබේ මුළු මාසික ආදායම ගණනය කරන්න.
+        </p>
+
+        <div class="space-y-6">
+            <div>
+                <label for="basicSalary" class="block text-sm font-medium text-gray-700 mb-1">මූලික මාසික වැටුප</label>
+                <div class="relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 sm:text-sm">රු.</span>
+                    </div>
+                    <input type="number" id="basicSalary" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-3 py-2 sm:text-sm border-gray-300 rounded-lg transition-colors duration-200" placeholder="උදා., 2000">
+                </div>
+            </div>
+
+            <div>
+                <label for="daytimeOtHours" class="block text-sm font-medium text-gray-700 mb-1">දිවා අතිකාල පැය ගණන</label>
+                <input type="number" id="daytimeOtHours" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full py-2 px-3 sm:text-sm border-gray-300 rounded-lg transition-colors duration-200" placeholder="උදා., 10">
+            </div>
+
+            <div>
+                <label for="nightOtHours" class="block text-sm font-medium text-gray-700 mb-1">රාත්‍රී අතිකාල පැය ගණන</label>
+                <input type="number" id="nightOtHours" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full py-2 px-3 sm:text-sm border-gray-300 rounded-lg transition-colors duration-200" placeholder="උදා., 5">
+            </div>
+
+            <button id="calculateBtn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                මුළු වැටුප ගණනය කරන්න
+            </button>
+
+            <div id="result" class="text-center mt-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200 hidden">
+                <p class="text-lg font-semibold text-gray-800">ඔබගේ මුළු මාසික වැටුප වන්නේ:</p>
+                <p class="text-4xl font-extrabold text-indigo-600 mt-2">රු.<span id="totalSalaryDisplay">0.00</span></p>
+            </div>
+
+            <div id="messageBox" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative hidden" role="alert">
+              <span class="block sm:inline" id="messageText"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const basicSalaryInput = document.getElementById('basicSalary');
+        const daytimeOtHoursInput = document.getElementById('daytimeOtHours');
+        const nightOtHoursInput = document.getElementById('nightOtHours');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resultDiv = document.getElementById('result');
+        const totalSalaryDisplay = document.getElementById('totalSalaryDisplay');
+        const messageBox = document.getElementById('messageBox');
+        const messageText = document.getElementById('messageText');
+
+        calculateBtn.addEventListener('click', calculateSalary);
+
+        function showMessage(message) {
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
+        }
+
+        function calculateSalary() {
+            const basicSalary = parseFloat(basicSalaryInput.value) || 0;
+            const daytimeOtHours = parseFloat(daytimeOtHoursInput.value) || 0;
+            const nightOtHours = parseFloat(nightOtHoursInput.value) || 0;
+
+            if (isNaN(basicSalary) || isNaN(daytimeOtHours) || isNaN(nightOtHours)) {
+                showMessage('සියලු ක්ෂේත්‍ර සඳහා වලංගු සංඛ්‍යාත්මක අගයන් ඇතුළත් කරන්න.');
+                return;
+            }
+
+            if (basicSalary < 0 || daytimeOtHours < 0 || nightOtHours < 0) {
+                showMessage('සියලු ක්ෂේත්‍ර සඳහා සෘණ නොවන අගයන් ඇතුළත් කරන්න.');
+                return;
+            }
+
+            // Calculate per-hour rate from basic salary
+            const workHourRate = basicSalary / 25 / 8;
+
+            // Calculate total overtime pay
+            const daytimeOtPay = daytimeOtHours * workHourRate * 1.5;
+            const nightOtPay = nightOtHours * workHourRate * 2;
+
+            // Calculate total salary
+            const totalSalary = basicSalary + daytimeOtPay + nightOtPay;
+
+            // Format and display the result
+            totalSalaryDisplay.textContent = totalSalary.toFixed(2);
+            resultDiv.classList.remove('hidden');
+            messageBox.classList.add('hidden');
+        }
+    </script>
+
+</body>
+</html>
